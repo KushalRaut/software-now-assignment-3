@@ -1,0 +1,36 @@
+Answer to the question 01:  
+
+This program is designed to securely process text data by applying a custom character-based 
+encryption and decryption technique to the contents of a text file. The program begins by 
+prompting the user to enter two integer values, referred to as shift1 and shift2. These values control 
+how much each character in the text is shifted during encryption and are essential for both 
+encrypting and later decrypting the file. The program reads input from a file named raw_text.txt, 
+ensuring support for multi-line text and UTF-8 encoding so that standard characters and formatting 
+are preserved. 
+
+The encryption process works by examining each character individually and applying different 
+shifting rules depending on whether the character is lowercase, uppercase, or non-alphabetic. 
+Lowercase letters are split into two alphabet ranges (a–m and n–z), with one group shifted forward 
+and the other shifted backward using combinations of the user inputs. Uppercase letters follow a 
+similar rule set but use different shift calculations, including squaring one of the input values. The 
+program uses built-in Python methods such as ord() and chr() to convert characters into numeric 
+values and back again, while modulo arithmetic (% 26) ensures that alphabet wrapping occurs 
+correctly without exceeding letter boundaries. All non-letter characters such as spaces, numbers, 
+and symbols remain unchanged. 
+
+Decryption uses the reverse logic of the encryption rules, ensuring that the original text can be 
+fully recovered when the same shift values are provided. After decryption, the program writes the 
+result to decrypted_text.txt and then verifies correctness by comparing it directly with the original 
+input file. If both files match exactly, the program confirms successful decryption. This approach 
+demonstrates a simple yet effective symmetric encryption method, emphasizing file handling, 
+character manipulation, and data integrity verification. 
+
+References: 
+Python Software Foundation. Python 3 Documentation – Built-in Functions. 
+/https://docs.python.org/3/library/functions.html 
+Python Software Foundation. Text File I/O in Python./ https://docs.python.org/3/tutorial/inputoutput.html 
+Stallings, W. (2017). Cryptography and Network Security: Principles and Practice. Pearson Education. 
+GeeksforGeeks. Character Encoding and ASCII Values in Python./ https://www.geeksforgeeks.org/ascii-table/ 
+OpenAI. ChatGPT. 
+ChatGPT was used to assist in explaining programming concepts, encryption and decryption logic, and file-handling 
+techniques in Python 
