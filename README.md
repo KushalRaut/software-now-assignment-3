@@ -29,6 +29,16 @@ This application is developed as part of HIT137 Assignment 3, showcasing:
 - **File Dialog Support** for JPG, PNG, and BMP formats
 - **Error Handling** with message boxes
 
+## 🛠️ Technologies Used
+
+- **Python 3**
+- **Tkinter** – GUI development
+- **OpenCV (cv2)** – Image processing
+- **Pillow (PIL)** – Image rendering in GUI
+- **NumPy** – Image data handling
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
