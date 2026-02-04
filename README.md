@@ -55,7 +55,7 @@ cd oop-image-editor
 
 2. **Create a virtual environment**
 
-Open terminal in VS Code (`Ctrl + \``) and run:
+Open terminal in VS Code and run:
 
 **Windows:**
 ```bash
