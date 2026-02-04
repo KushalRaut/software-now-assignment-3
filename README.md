@@ -49,7 +49,7 @@ This application is developed as part of HIT137 Assignment 3, showcasing:
 
 1. **Clone the repository**
 ```bash
-git clone <your-github-repository-url>
+git clone https://github.com/mazharsnow/oop-image-editor.git
 cd OOP_PROJECT
 ```
 
