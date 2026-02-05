@@ -1,0 +1,10 @@
+echo "__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+*.log
+.DS_Store
+*.jpg
+*.png" > .gitignore
