@@ -17,8 +17,6 @@ venv/
 __pycache__/
 *.pyc
 
-# Generated outputs
-outputs/
 
 # IDE settings
 .idea/
