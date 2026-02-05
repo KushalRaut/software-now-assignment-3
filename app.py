@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import cv2
-import numpy as np
-import os
+
+from image_manager import ImageManager
 
 class ImageProcessor:
     def __init__(self):
@@ -72,9 +72,10 @@ class ImageProcessor:
     def resize(self, scale):
         if self.image is not None:
             (h, w) = self.image.shape[:2]
-            new_h = int(h * scale / 100)
-            new_w = int(w * scale / 100)
-            self.image = cv2.resize(self.image, (new_w, new_h))
+            scale_pct = float(scale) / 100.0
+            new_h = max(1, int(h * scale_pct))
+            new_w = max(1, int(w * scale_pct))
+            self.image = cv2.resize(self.image, (new_w, new_h), interpolation=cv2.INTER_AREA)
             return self.image
 
     def get_image(self):
@@ -93,11 +94,11 @@ class UndoRedoManager:
         self.history.append(image.copy())
         self.redo_stack.clear()  # Clear redo stack on new action
 
-    def undo(self):
+    def undo(self, current=None):
         if self.history:
-            last_state = self.history.pop()
-            self.redo_stack.append(last_state)
-            return self.history[-1] if self.history else None
+            if current is not None:
+                self.redo_stack.append(current.copy())
+            return self.history.pop()
         return None
 
     def redo(self):
@@ -150,6 +151,7 @@ class App(tk.Tk):
 
         self.processor = ImageProcessor()
         self.undo_manager = UndoRedoManager()
+        self.manager = ImageManager()
         self.current_file = None
 
         self.create_menu()
@@ -164,7 +166,7 @@ class App(tk.Tk):
         filemenu.add_command(label="Save", command=self.save_image)
         filemenu.add_command(label="Save As", command=self.save_as_image)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self.quit)
+        filemenu.add_command(label="Exit", command=self._confirm_exit)
         menubar.add_cascade(label="File", menu=filemenu)
 
         editmenu = tk.Menu(menubar, tearoff=0)
@@ -173,6 +175,10 @@ class App(tk.Tk):
         menubar.add_cascade(label="Edit", menu=editmenu)
 
         self.config(menu=menubar)
+
+    def _confirm_exit(self):
+        if messagebox.askokcancel("Exit", "Do you want to exit?"):
+            self.quit()
 
     def create_widgets(self):
         self.toolbar = Toolbar(self, self)
@@ -186,6 +192,7 @@ class App(tk.Tk):
         if file_path:
             try:
                 image = self.processor.load_image(file_path)
+                self.manager.load_image(file_path)
                 self.undo_manager.save_state(image)
                 self.current_file = file_path
                 self.display_image()
@@ -209,6 +216,7 @@ class App(tk.Tk):
             try:
                 self.processor.save_image(file_path)
                 self.current_file = file_path
+                self.manager._filepath = file_path
                 messagebox.showinfo("Success", "Image saved successfully")
             except ValueError as e:
                 messagebox.showerror("Error", str(e))
@@ -222,17 +230,18 @@ class App(tk.Tk):
             self.image_label.config(image=self.photo)
 
     def update_status(self):
-        if self.processor.image is not None:
-            h, w = self.processor.image.shape[:2]
-            filename = os.path.basename(self.current_file) if self.current_file else "Untitled"
-            self.status_bar.config(text=f"File: {filename} | Dimensions: {w}x{h}")
+        self.status_bar.config(text=self.manager.get_info())
 
     def apply_effect(self, func, *args):
         current_image = self.processor.get_image()
-        if current_image is not None:
-            self.undo_manager.save_state(current_image)
-            func(*args)
-            self.display_image()
+        if current_image is None:
+            messagebox.showerror("Error", "Please open an image first.")
+            return
+        self.undo_manager.save_state(current_image)
+        func(*args)
+        self.manager._image = self.processor.get_image()
+        self.display_image()
+        self.update_status()
 
     def apply_grayscale(self):
         self.apply_effect(self.processor.grayscale)
@@ -256,21 +265,26 @@ class App(tk.Tk):
     def apply_flip(self, direction):
         self.apply_effect(self.processor.flip, direction)
 
-    def apply_resize(self, scale):
-        self.apply_effect(self.processor.resize, scale)
+    def apply_resize(self, scale=None):
+        val = float(self.toolbar.scale_slider.get()) if scale is None else float(scale)
+        self.apply_effect(self.processor.resize, val)
 
     def undo(self):
-        state = self.undo_manager.undo()
+        state = self.undo_manager.undo(self.processor.get_image())
         if state is not None:
             self.processor.image = state
+            self.manager._image = state
             self.display_image()
+            self.update_status()
 
     def redo(self):
         state = self.undo_manager.redo()
         if state is not None:
             self.processor.image = state
+            self.manager._image = state
             self.display_image()
+            self.update_status()
 
 if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+    app = App()   
+    app.mainloop()            
