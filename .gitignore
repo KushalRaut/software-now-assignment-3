@@ -8,3 +8,18 @@ venv/
 .DS_Store
 *.jpg
 *.png" > .gitignore
+
+
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated outputs
+outputs/
+
+# IDE settings
+.idea/
+.vscode/
